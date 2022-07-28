@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>QV Park</title>
+
+    <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
+    <meta name="theme-color" content="black">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/barcodes/JsBarcode.code128.min.js"></script>
+
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #main {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-content: center;
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        #generate {
+            background-color: #00aa30;
+            color: white;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+<div id="main">
+    <h1>QV Park</h1>
+    <svg id="barcode" width="100%"></svg>
+    <button id="generate">Generate</button>
+</div>
+<script>
+  window.addEventListener('load', () => {
+    registerSW();
+  });
+
+  document.getElementById('generate').addEventListener('click', generateBarcode);
+
+  // Register the Service Worker
+  async function registerSW() {
+    if ('serviceWorker' in navigator) {
+      try {
+        await navigator
+          .serviceWorker
+          .register('serviceworker.js');
+      } catch (e) {
+        console.log('SW registration failed');
+      }
+    }
+  }
+
+  function randomInt(from, to) {
+    return Math.floor(Math.random() * (to - from + 1)) + from;
+  }
+
+  function generateBarcode() {
+    const pos = randomInt(10, 99).toString().padStart(3, '0');
+    const transaction = randomInt(1000, 9999).toString().padStart(4, '0');
+    const valueCode = '25';
+    const now = new Date();
+    const dateStamp = [
+      now.getDate().toString().padStart(2, '0'),
+      (now.getMonth() + 1).toString().padStart(2, '0'),
+      now.getFullYear().toString().slice(2)
+    ].join('');
+    const barcodeValue = `36203304${pos}${transaction}${valueCode}${dateStamp}0`;
+
+    JsBarcode('#barcode', barcodeValue, {format: 'code128'});
+
+    document.getElementById('barcode').setAttribute('width', '100%');
+  }
+</script>
+</body>
+</html>
