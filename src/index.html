@@ -53,9 +53,12 @@
 
 <body>
 <div id="main">
-    <h1>QV Park</h1>
     <svg id="barcode" width="100%"></svg>
-    <button id="generate">Generate</button>
+    <div style="text-align: center">
+        <h1>QV Park</h1>
+        <p style="font-size: 30px">🚗💨</p>
+    </div>
+    <button id="generate">Generate New</button>
 </div>
 <script>
   window.addEventListener('load', () => {
@@ -63,6 +66,7 @@
   });
 
   document.getElementById('generate').addEventListener('click', generateBarcode);
+  generateBarcode();
 
   // Register the Service Worker
   async function registerSW() {
