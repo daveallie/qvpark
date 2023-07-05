@@ -1,5 +1,5 @@
 const cachePrefix = 'pwa-qvpark';
-const version = '1.2.0';
+const version = '1.3.0';
 
 const cacheName = `${cachePrefix}-${version}`;
 
@@ -11,6 +11,15 @@ self.addEventListener('install', async (event) => {
     caches.open(cacheName).then((cache) => cache.addAll(urlsToCache))
   );
 });
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => cacheNames.filter((cn) => cn !== cacheName))
+      .then(cachesToDelete => Promise.all(cachesToDelete.map(cacheToDelete => caches.delete(cacheToDelete))))
+      .then(() => self.clients.claim())
+  );
+});
+
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
