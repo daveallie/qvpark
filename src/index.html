@@ -48,6 +48,17 @@
             font-size: 1.2em;
             font-weight: bold;
         }
+
+        #setPos {
+            background-color: #0069aa;
+            color: white;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 0 20px 20px 20px;
+            font-size: 0.8em;
+        }
     </style>
 </head>
 
@@ -58,14 +69,19 @@
         <h1>QV Park</h1>
         <p style="font-size: 30px">🚗💨</p>
     </div>
-    <button id="generate">Generate New</button>
+    <div style="display: flex; flex-direction: column">
+        <button id="generate">Generate New</button>
+        <button id="setPos">Set POS</button>
+    </div>
 </div>
 <script>
+  let pos = randomInt(10, 99);
   window.addEventListener('load', () => {
     registerSW();
   });
 
   document.getElementById('generate').addEventListener('click', generateBarcode);
+  document.getElementById('setPos').addEventListener('click', setPos);
   generateBarcode();
 
   // Register the Service Worker
@@ -85,8 +101,21 @@
     return Math.floor(Math.random() * (to - from + 1)) + from;
   }
 
+  function setPos() {
+    const newPos = parseInt(prompt('Enter POS (10 - 99)', pos));
+    if (!isNaN(newPos)) {
+      pos = newPos;
+      if (pos < 10) {
+        pos = 10;
+      } else if (pos > 99) {
+        pos = 99;
+      }
+      generateBarcode();
+    }
+  }
+
   function generateBarcode() {
-    const pos = randomInt(10, 99).toString().padStart(3, '0');
+    const posStr = pos.toString().padStart(3, '0');
     const transaction = randomInt(1000, 9999).toString().padStart(4, '0');
     const valueCode = '25';
     const now = new Date();
@@ -95,7 +124,7 @@
       (now.getMonth() + 1).toString().padStart(2, '0'),
       now.getFullYear().toString().slice(2)
     ].join('');
-    const barcodeValue = `36203304${pos}${transaction}${valueCode}${dateStamp}0`;
+    const barcodeValue = `36203304${posStr}${transaction}${valueCode}${dateStamp}0`;
 
     JsBarcode('#barcode', barcodeValue, {format: 'code128'});
 
